@@ -1,0 +1,124 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
+@inject ILogger<Index> Logger
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>Welcome, @currentUser! Login to access the Board Game Tracker tool.</h1>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <AuthorizeView>
+            <Authorized>
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h1 class="card-title">
+                                <i class="fas fa-dice-d20 text-primary me-2"></i>
+                                Board Game Tracker
+                            </h1>
+                            <p class="card-text">
+                                Manage your board game inventory, track games, and organize your collection.
+                            </p>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="NavigateToTool">Open Tool</MudButton>
+                        </div>
+                    </div>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
+        <AuthorizeView>
+            <Authorized>
+                <h5>User Claims:</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Claim Type</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var claim in authState.User.Claims.OrderBy(c => c.Type))
+                            {
+                                <tr>
+                                    <td>
+                                        <code>@GetFriendlyClaimName(claim.Type)</code>
+                                    </td>
+                                    <td>
+                                        @if (claim.Type.Contains("group") || claim.Type.Contains("role"))
+                                        {
+                                            <span class="badge bg-primary">@claim.Value</span>
+                                        }
+                                        else if (claim.Type.Contains("email"))
+                                        {
+                                            <span class="text-info">@claim.Value</span>
+                                        }
+                                        else
+                                        {
+                                            @claim.Value
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+</div> 
+
+@code 
+{
+    private string currentUser = "";
+    private string ToolUrl = "";
+    private AuthenticationState? authState;
+
+    protected override async Task OnInitializedAsync()
+    {
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        currentUser = authState.User.Identity?.Name
+            ?? authState.User.FindFirst("name")?.Value
+            ?? authState.User.FindFirst("preferred_username")?.Value
+            ?? "User";
+        ToolUrl = Configuration["ToolUrls:BoardGameTracker"];
+    }
+
+    private void NavigateToTool()
+    {
+        Logger.LogInformation($"Navigating to: {ToolUrl}");
+        NavigationManager.NavigateTo(ToolUrl, forceLoad: true);
+    }
+
+    private string GetFriendlyClaimName(string claimType)
+    {
+        return claimType switch
+        {
+            "sub" => "Subject ID",
+            "iss" => "Issuer",
+            "aud" => "Audience",
+            "exp" => "Expires",
+            "iat" => "Issued At",
+            "auth_time" => "Auth Time",
+            "cognito:groups" => "Cognito Groups",
+            "cognito:username" => "Username",
+            "email" => "Email",
+            "email_verified" => "Email Verified",
+            "given_name" => "First Name",
+            "family_name" => "Last Name",
+            "name" => "Full Name",
+            "preferred_username" => "Preferred Username",
+            "token_use" => "Token Use",
+            "client_id" => "Client ID",
+            "username" => "Username",
+            _ => claimType
+        };
+    }
+}

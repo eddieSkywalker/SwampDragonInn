@@ -354,3 +354,4 @@ appsettings.Production.json
 appsettings.Staging.json
 appsettings.Test.json
 appsettings.Local.json
+appsettings.*.json
