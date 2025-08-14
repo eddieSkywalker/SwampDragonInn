@@ -1,0 +1,22 @@
+flowchart TD
+    User([fa:fa-user User])
+    Start["User accesses Main WebApp (SwampDragonInn)"]
+    Login["User chooses to Login with an Account"]
+    NoLogin["User does not Login"]
+    SharedKey["Shared-Key setup locally in Program/AppSettings for SSO. Custom domains are also needed. i.e. home.localtest.me and bgt.localtest.me"]
+    BoardGameTracker["Access BoardGameTracker Web App"]
+    Restricted["BoardGameTracker is restricted without login"]
+    DB[(fa:fa-database Database)]
+
+    User --> Start
+    Start --> Login
+    Start --> NoLogin
+    Login --> SharedKey
+    SharedKey --> BoardGameTracker
+    NoLogin --> Restricted
+    Login --> DB
+    BoardGameTracker --> DB
+
+    style Restricted fill:#ffcccc,stroke:#ff0000,stroke-width:2px
+    style BoardGameTracker fill:#ccffcc,stroke:#008000,stroke-width:2px
+    style DB fill:#e6ccff,stroke:#800080,stroke-width:2px
