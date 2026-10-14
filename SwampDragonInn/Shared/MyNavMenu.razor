@@ -7,7 +7,6 @@
     <AuthorizeView>
         <Authorized>
             <MudNavLink Href="@($"{MyGamesUrl}")" Target="_self">My Games</MudNavLink>
-            <MudNavLink Href="@($"{AddGameUrl}")" Target="_self">Add Game</MudNavLink>
             <MudNavLink onclick="Logout" Match="NavLinkMatch.Prefix">Logout</MudNavLink>
         </Authorized>
         <NotAuthorized>
@@ -19,8 +18,6 @@
 
 @code {
     private string MyGamesUrl => Configuration["ToolUrls:MyGames"];
-    //private string AddGameUrl => Configuration["ToolUrls:AddGame"] ?? "/addgame";
-    //private string MyGamesUrl => Configuration["ToolUrls:BoardGameTracker"] + "/authentication/login?returnUrl=/mygames";
     private string AddGameUrl => Configuration["ToolUrls:BoardGameTracker"] + "/authentication/login?returnUrl=/addgame";
 
     /// <summary>
